@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - StayUp</title>
+  <style>
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(135deg,#6a11cb,#2575fc);}
+    .card{width:360px;padding:28px;border-radius:14px;background:rgba(255,255,255,0.12);
+      backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.25);color:#fff;}
+    .card h2{text-align:center;margin-bottom:18px}
+    input{width:100%;padding:12px;border-radius:10px;border:none;margin:8px 0;outline:none}
+    button{width:100%;padding:12px;border-radius:10px;border:none;background:#fff;color:#3b1f7a;font-weight:700;cursor:pointer}
+    .error{color:#ffeb3b;margin-top:10px;display:none}
+    .debug{font-size:12px;opacity:.85;margin-top:10px;color:#cfe9ff}
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Login form">
+    <h2>Welcome — Login</h2>
+
+    <!-- Use a real <form> but prevent default submit so redirect always runs -->
+    <form id="loginForm" autocomplete="off" novalidate>
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <button id="loginBtn" type="submit">Login</button>
+      <div id="error" class="error" aria-live="polite"></div>
+      <div id="debug" class="debug" aria-hidden="true"></div>
+    </form>
+  </div>
+
+<script>
+  (function(){
+    // ====== CONFIGURE THIS ======
+    const CORRECT_EMAIL = "dhanu@gmail.com";
+    const CORRECT_PASS  = "12345";
+    // Set URL to your main site. Use relative path or full URL:
+    const REDIRECT_URL = "home.html";
+    // ===========================
+
+    const form = document.getElementById('loginForm');
+    const emailEl = document.getElementById('email');
+    const passEl  = document.getElementById('password');
+    const errorEl = document.getElementById('error');
+    const debugEl = document.getElementById('debug');
+
+    // Show helpful debug info for testing (remove in production)
+    function showDebug(msg){
+      debugEl.style.display = 'block';
+      debugEl.textContent = msg;
+      debugEl.setAttribute('aria-hidden', 'false');
+      console.log('DEBUG:', msg);
+    }
+
+    function showError(msg){
+      errorEl.style.display = 'block';
+      errorEl.textContent = "❌ " + msg;
+      showDebug('Error shown to user: ' + msg);
+    }
+
+    // Prevent form submit default (page reload) and handle safely
+    form.addEventListener('submit', function(e){
+      e.preventDefault();          // stop regular form submission
+      errorEl.style.display = 'none';
+      const email = emailEl.value.trim();    // trim spaces
+      const pass  = passEl.value.trim();
+
+      showDebug('Submitted email="' + email + '" pass length=' + pass.length);
+
+      // basic empty checks
+      if(!email || !pass){
+        showError('Please enter email and password.');
+        return;
+      }
+
+      // check credentials (client-side static check)
+      if(email === CORRECT_EMAIL && pass === CORRECT_PASS){
+        showDebug('Credentials OK — redirecting to ' + REDIRECT_URL);
+
+        // Try different redirect methods for robustness
+        try {
+          // best for navigation history
+          window.location.assign(REDIRECT_URL);
+          // fallback to replace if assign doesn't work
+          setTimeout(()=> { if(location.href.indexOf(REDIRECT_URL)===-1) location.replace(REDIRECT_URL); }, 300);
+        } catch (err) {
+          showError('Redirect failed: ' + (err.message || err));
+        }
+
+      } else {
+        showError('Incorrect email or password.');
+      }
+    });
+
+    // Helpful tip visible on load
+    showDebug('Login page loaded. Redirect target: ' + REDIRECT_URL + '. Make sure file exists and path is correct.');
+  })();
+</script>
+</body>
+</html>
